@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fake Website Detector — No Cap</title>
+<meta name="description" content="Paste any link and No Cap checks it for insecure connections, shorteners, bait keywords, raw IP hosts, hyphen stuffing, lookalike spelling and more — with a plain-language explanation of every signal.">
+<meta name="theme-color" content="#04070f">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/core.css">
+<link rel="stylesheet" href="/assets/css/tools.css">
+<script>
+  (function () {
+    try {
+      var p = JSON.parse(localStorage.getItem("nocap.prefs.v1") || "{}");
+      if (p.theme) document.documentElement.setAttribute("data-theme", p.theme);
+      if (p.lang) document.documentElement.lang = p.lang;
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body>
+
+<div class="ambient" aria-hidden="true">
+  <div class="ambient__grid"></div>
+  <div class="ambient__orb ambient__orb--a"></div>
+  <div class="ambient__orb ambient__orb--b"></div>
+  <canvas id="particles"></canvas>
+  <div class="ambient__noise"></div>
+</div>
+<div class="cursor" aria-hidden="true"></div>
+<div class="cursor-ring" aria-hidden="true"></div>
+
+<div class="page">
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <div class="wrap masthead__inner">
+    <a class="brand" href="/">
+      <svg class="brand__mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <path d="M16 2.6l11 4.2v8.4c0 6.9-4.6 11.8-11 13.8-6.4-2-11-6.9-11-13.8V6.8l11-4.2z" stroke="var(--cyan)" stroke-width="1.7"/>
+        <path d="M10.5 16.2l3.8 3.8 7.4-7.6" stroke="var(--cyan)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      No&nbsp;Cap
+      <span class="brand__cap">v1</span>
+    </a>
+    <nav class="nav" id="primary-nav" aria-label="Primary">
+      <a href="/" data-i18n="nav_home">Home</a>
+      <a href="/link-scanner" data-i18n="nav_link">Link Scanner</a>
+      <a href="/image-lab" data-i18n="nav_image">Image Lab</a>
+      <a href="/video-lab" data-i18n="nav_video">Video Lab</a>
+      <a href="/news-desk" data-i18n="nav_news">News Desk</a>
+      <a href="/review-audit" data-i18n="nav_review">Review Audit</a>
+      <a href="/message-guard" data-i18n="nav_message">Message Guard</a>
+      <a href="/settings" data-i18n="nav_settings">Settings</a>
+    </nav>
+    <div class="masthead__actions">
+      <button class="icon-btn" data-theme-toggle type="button" aria-label="Switch colour theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">
+          <path d="M20.5 14.2A8.6 8.6 0 019.8 3.5a8.6 8.6 0 1010.7 10.7z"/>
+        </svg>
+      </button>
+      <button class="icon-btn nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="wrap section">
+    <div class="tool-head">
+      <span class="eyebrow">Detector 01</span>
+      <h1><span class="grad-text">Fake Website Detector</span></h1>
+      <p class="lede">Paste a link before you click it. Nova runs twelve structural checks locally, then asks the analysis model for a second opinion on the wording and the brand it is imitating.</p>
+    </div>
+
+    <div class="glass pad ticked mt-3">
+      <form id="scanForm" novalidate>
+        <div class="field">
+          <label for="urlInput">Link to check</label>
+          <div class="input-row">
+            <input class="input mono" id="urlInput" type="text" inputmode="url" autocomplete="off" spellcheck="false"
+                   placeholder="https://example.com/login" aria-describedby="urlHelp">
+            <button class="btn btn--primary" type="submit" id="scanBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+              <span data-i18n="btn_scan">Scan</span>
+            </button>
+          </div>
+          <p class="field-hint" id="urlHelp">Nothing is stored. The link is analysed and discarded.</p>
+          <p class="field-error" id="urlError" role="alert">That does not look like a web address. Try something like <span class="mono">https://site.com/page</span>.</p>
+        </div>
+
+        <div class="row mt-2">
+          <span class="muted" style="font-size:.82rem">Try one:</span>
+          <button class="btn btn--sm btn--ghost" type="button" data-sample="http://secure-paytm-refund-verify.top/login-account-update">Phishing-style</button>
+          <button class="btn btn--sm btn--ghost" type="button" data-sample="https://bit.ly/3xAmPle">Shortened</button>
+          <button class="btn btn--sm btn--ghost" type="button" data-sample="https://www.rbi.org.in/Scripts/NotificationUser.aspx">Legitimate</button>
+        </div>
+      </form>
+
+      <div class="scanner" id="scanner" aria-hidden="true">
+        <div class="scanner__beam"></div>
+        <div class="scanner__log mono" id="scannerLog"></div>
+      </div>
+
+      <div class="result" id="result" aria-live="polite">
+        <div class="verdict">
+          <div class="dial">
+            <svg viewBox="0 0 140 140" aria-hidden="true">
+              <defs>
+                <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="var(--cyan)"/>
+                  <stop offset="100%" stop-color="var(--blue)"/>
+                </linearGradient>
+              </defs>
+              <circle class="dial__track" cx="70" cy="70" r="60"/>
+              <circle class="dial__arc" id="dialArc" cx="70" cy="70" r="60"/>
+            </svg>
+            <div class="dial__num"><b id="riskScore">0</b><span>risk</span></div>
+          </div>
+
+          <div class="verdict__body">
+            <div class="verdict__label" id="verdictLabel">—</div>
+            <p class="verdict__sub" id="verdictSub"></p>
+            <div class="meter" id="riskMeter">
+              <div class="meter__fill" id="meterFill"></div>
+            </div>
+            <div class="meter__scale">
+              <span>0 · safe</span><span>33 · caution</span><span>65 · danger</span><span>100</span>
+            </div>
+            <p class="mono muted mt-2" style="font-size:.78rem;word-break:break-all" id="scannedUrl"></p>
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <h3 data-i18n="st_findings">Findings</h3>
+          <div class="findings mt-2" id="findings"></div>
+        </div>
+
+        <div class="notice mt-3" id="aiNote" hidden></div>
+
+        <div class="row mt-3">
+          <button class="btn btn--ghost btn--sm" type="button" id="resetBtn" data-i18n="btn_reset">Reset</button>
+          <button class="btn btn--ghost btn--sm" type="button" id="copyBtn">Copy report</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ playbook -->
+  <section class="wrap section">
+    <div class="section-head">
+      <span class="eyebrow">Reference</span>
+      <h2>Fake sites and safe sites</h2>
+      <p class="lede">No Cap does not run a live blocklist — those go stale within hours. What does not go stale is the template. Learn the six shapes below and you will recognise the next one on sight.</p>
+    </div>
+
+    <div class="ref-cols">
+      <div class="glass pad">
+        <h3 class="tone-danger">Templates that keep working</h3>
+        <p class="muted mt-1" style="font-size:.86rem">Addresses shown are illustrative patterns, not real sites.</p>
+        <div class="ref-list mt-3">
+          <div class="ref-item">
+            <span class="ref-item__name mono">secure-&lt;bank&gt;-verify.top</span>
+            <span class="ref-item__why">Brand name sandwiched between security words on a cheap top-level domain. Banks use their own registered domain, never a rented lookalike.</span>
+          </div>
+          <div class="ref-item">
+            <span class="ref-item__name mono">amaz0n-offers.shop</span>
+            <span class="ref-item__why">Character swap: zero for O, rn for m, l for I. Reads correctly at a glance, resolves somewhere else entirely.</span>
+          </div>
+          <div class="ref-item">
+            <span class="ref-item__name mono">flipkart.com.deals-india.live</span>
+            <span class="ref-item__why">The real brand placed in a subdomain. Only the last two labels before the slash decide who owns the site — here that is <span class="mono">deals-india.live</span>.</span>
+          </div>
+          <div class="ref-item">
+            <span class="ref-item__name mono">http://192.168-style-ip/login</span>
+            <span class="ref-item__why">A raw IP address instead of a name. No real consumer brand asks you to log in at a number.</span>
+          </div>
+          <div class="ref-item">
+            <span class="ref-item__name mono">govt-refund-claim-portal-online.xyz</span>
+            <span class="ref-item__why">Keyword stuffing with hyphens. Written for a scam-ad click, not for humans to remember.</span>
+          </div>
+          <div class="ref-item">
+            <span class="ref-item__name mono">bit.ly/xxxxx → ?</span>
+            <span class="ref-item__why">A shortener hides the destination completely. Expand it before you trust it — several previewers do this for free.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass pad">
+        <h3 class="tone-safe">Where to buy and where to check</h3>
+        <p class="muted mt-1" style="font-size:.86rem">Established, verifiable destinations. Always type or bookmark them — never arrive from a message.</p>
+        <div class="ref-list mt-3">
+          <div class="ref-item">
+            <span class="ref-item__name">Genuine products</span>
+            <span class="ref-item__why"><span class="mono">amazon.com</span> · <span class="mono">flipkart.com</span> · <span class="mono">apple.com</span> · <span class="mono">samsung.com</span> · <span class="mono">nike.com</span> — or the brand's own site reached through a search engine, not a link.</span>
+          </div>
+          <div class="ref-item">
+            <span class="ref-item__name">Accurate information</span>
+            <span class="ref-item__why"><span class="mono">reuters.com</span> · <span class="mono">apnews.com</span> · <span class="mono">bbc.com</span> · <span class="mono">who.int</span> · <span class="mono">nasa.gov</span> · <span class="mono">rbi.org.in</span></span>
+          </div>
+          <div class="ref-item">
+            <span class="ref-item__name">Fact-checking</span>
+            <span class="ref-item__why"><span class="mono">snopes.com</span> · <span class="mono">factcheck.org</span> · <span class="mono">fullfact.org</span> · <span class="mono">altnews.in</span></span>
+          </div>
+          <div class="ref-item">
+            <span class="ref-item__name">Reputation lookups</span>
+            <span class="ref-item__why"><span class="mono">virustotal.com</span> · <span class="mono">urlvoid.com</span> · <span class="mono">scamadviser.com</span> · <span class="mono">phishtank.org</span> · Google's Safe Browsing status page.</span>
+          </div>
+          <div class="ref-item">
+            <span class="ref-item__name">Reporting a scam</span>
+            <span class="ref-item__why">Your national cybercrime portal, your bank's fraud line, and the brand being impersonated — all three, in that order.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================= signals -->
+  <section class="wrap section section--tight">
+    <div class="section-head">
+      <span class="eyebrow">Under the hood</span>
+      <h2>The twelve checks</h2>
+    </div>
+    <div class="check-grid" id="checkGrid"></div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__grid">
+      <div>
+        <a class="brand" href="/">
+          <svg class="brand__mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <path d="M16 2.6l11 4.2v8.4c0 6.9-4.6 11.8-11 13.8-6.4-2-11-6.9-11-13.8V6.8l11-4.2z" stroke="var(--cyan)" stroke-width="1.7"/>
+            <path d="M10.5 16.2l3.8 3.8 7.4-7.6" stroke="var(--cyan)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          No&nbsp;Cap
+        </a>
+        <p class="muted mt-2" style="font-size:.88rem;max-width:38ch" data-i18n="foot_note">Educational tool. Always confirm with an official source before you pay, click or share.</p>
+      </div>
+      <div>
+        <h4>Detectors</h4>
+        <ul>
+          <li><a href="/link-scanner">Link Scanner</a></li>
+          <li><a href="/image-lab">Image Lab</a></li>
+          <li><a href="/video-lab">Video Lab</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Analysis</h4>
+        <ul>
+          <li><a href="/news-desk">News Desk</a></li>
+          <li><a href="/review-audit">Review Audit</a></li>
+          <li><a href="/message-guard">Message Guard</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Console</h4>
+        <ul>
+          <li><a href="/#learn">Field guide</a></li>
+          <li><a href="/#dashboard">Dashboard</a></li>
+          <li><a href="/settings">Settings</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot__base">
+      <span>No Cap — cybersecurity awareness console</span>
+      <span>Nothing you scan is stored</span>
+    </div>
+  </div>
+</footer>
+</div>
+
+<div class="nova-bubble" role="status" aria-live="polite"></div>
+<button class="nova-helper" type="button" aria-label="Ask Nova for a safety tip">
+  <svg viewBox="0 0 60 60" fill="none" aria-hidden="true">
+    <rect x="12" y="14" width="36" height="30" rx="13" fill="rgba(20,34,56,.9)" stroke="var(--cyan)" stroke-opacity=".6" stroke-width="1.5"/>
+    <rect x="17" y="21" width="26" height="16" rx="8" fill="#04121c" stroke="var(--cyan)" stroke-opacity=".4"/>
+    <ellipse cx="25" cy="29" rx="3.2" ry="3.8" fill="var(--cyan)"/>
+    <ellipse cx="35" cy="29" rx="3.2" ry="3.8" fill="var(--cyan)"/>
+    <path d="M30 14V8" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="30" cy="6" r="3" fill="var(--cyan)"/>
+  </svg>
+</button>
+
+<script src="/assets/js/i18n-data.js"></script>
+<script src="/assets/js/app.js"></script>
+<script src="/assets/js/url-scan.js"></script>
+</body>
+</html>
