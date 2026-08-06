@@ -1,0 +1,263 @@
+/* ==========================================================================
+   No Cap â€” Nova boot sequence (loading screen mascot)
+   ========================================================================== */
+
+.boot {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 50% 120%, rgba(34, 233, 255, 0.13), transparent 62%),
+    radial-gradient(90% 70% at 80% -20%, rgba(64, 121, 255, 0.18), transparent 60%),
+    var(--bg-deep);
+  transition: opacity 0.9s var(--ease), transform 0.9s var(--ease), visibility 0.9s;
+}
+.boot.is-done {
+  opacity: 0;
+  transform: scale(1.06);
+  visibility: hidden;
+  pointer-events: none;
+}
+body.is-booting { overflow: hidden; }
+
+/* Floor grid Nova walks across */
+.boot__floor {
+  position: absolute;
+  inset: 42% 0 0;
+  background-image:
+    linear-gradient(rgba(90, 175, 240, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(90, 175, 240, 0.14) 1px, transparent 1px);
+  background-size: 74px 74px;
+  transform: perspective(560px) rotateX(72deg);
+  transform-origin: 50% 0;
+  animation: bootFloor 3.4s linear infinite;
+  mask-image: linear-gradient(to bottom, #000 0 35%, transparent 88%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0 35%, transparent 88%);
+}
+@keyframes bootFloor { to { background-position: 0 74px; } }
+
+.boot__horizon {
+  position: absolute;
+  left: 0; right: 0; top: 42%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  box-shadow: 0 0 40px 6px rgba(34, 233, 255, 0.35);
+  opacity: 0.75;
+}
+
+.boot__brand {
+  position: absolute;
+  top: clamp(1.6rem, 5vh, 3.4rem);
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+  gap: 0.7rem;
+  text-align: center;
+  width: min(90vw, 680px);
+}
+.boot__brand h1 {
+  font-size: clamp(2.1rem, 1.4rem + 3.4vw, 4rem);
+  letter-spacing: 0.03em;
+}
+.boot__brand p {
+  font-family: var(--font-mono);
+  font-size: clamp(0.62rem, 0.55rem + 0.3vw, 0.78rem);
+  letter-spacing: 0.36em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Boot log */
+.boot__log {
+  position: absolute;
+  left: clamp(1rem, 4vw, 3rem);
+  top: clamp(1.2rem, 4vh, 2.4rem);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--faint);
+  display: grid;
+  gap: 0.28rem;
+  max-width: 40vw;
+}
+.boot__log li { opacity: 0; animation: lineIn 0.5s var(--ease) forwards; }
+.boot__log b { color: var(--cyan); font-weight: 500; }
+@media (max-width: 780px) { .boot__log { display: none; } }
+
+/* --- Nova ---------------------------------------------------------------- */
+
+.nova {
+  --nx: -60vw;
+  --ny: 0px;
+  --sc: 1;
+  --flip: 1;
+  --turn: 26deg;
+  position: absolute;
+  left: 50%;
+  bottom: clamp(9vh, 14vh, 20vh);
+  width: clamp(120px, 17vw, 210px);
+  margin-left: calc(clamp(120px, 17vw, 210px) / -2);
+  transform: translate3d(var(--nx), var(--ny), 0) scale(var(--sc));
+  transition: transform var(--nova-dur, 3.4s) linear, opacity 0.6s var(--ease);
+  will-change: transform;
+}
+.nova__inner {
+  transform: perspective(760px) rotateY(var(--turn)) scaleX(var(--flip));
+  transition: transform 0.6s var(--ease);
+}
+.nova__bob { animation: novaBob 0.62s ease-in-out infinite; }
+.nova.is-idle .nova__bob { animation: novaIdle 3.2s ease-in-out infinite; }
+@keyframes novaBob {
+  0%, 100% { transform: translateY(0) rotate(-1.4deg); }
+  50% { transform: translateY(-7px) rotate(1.4deg); }
+}
+@keyframes novaIdle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.nova svg { width: 100%; height: auto; overflow: visible; }
+
+/* Walk cycle for the legs */
+.nova .leg-l { transform-origin: 97px 170px; animation: stepA 0.62s ease-in-out infinite; }
+.nova .leg-r { transform-origin: 122px 170px; animation: stepB 0.62s ease-in-out infinite; }
+.nova.is-idle .leg-l,
+.nova.is-idle .leg-r { animation: none; }
+@keyframes stepA {
+  0%, 100% { transform: rotate(20deg); }
+  50% { transform: rotate(-20deg); }
+}
+@keyframes stepB {
+  0%, 100% { transform: rotate(-20deg); }
+  50% { transform: rotate(20deg); }
+}
+.nova .arm-l { transform-origin: 62px 128px; animation: stepB 0.62s ease-in-out infinite; }
+.nova .arm-r { transform-origin: 158px 128px; animation: stepA 0.62s ease-in-out infinite; }
+.nova.is-idle .arm-l { animation: armWaveL 3.2s ease-in-out infinite; }
+.nova.is-idle .arm-r { animation: armWaveR 2.4s ease-in-out infinite; }
+@keyframes armWaveL { 0%, 100% { transform: rotate(6deg); } 50% { transform: rotate(-8deg); } }
+@keyframes armWaveR { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(10deg); } }
+
+/* Eye blink */
+.nova .eye { animation: blink 4.6s infinite; transform-origin: center; }
+@keyframes blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.12); }
+}
+
+/* Ground shadow */
+.nova__shadow {
+  position: absolute;
+  left: 50%;
+  bottom: -14px;
+  width: 62%;
+  height: 14px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(34, 233, 255, 0.35), transparent 70%);
+  filter: blur(4px);
+  animation: shadowPulse 0.62s ease-in-out infinite;
+}
+.nova.is-idle .nova__shadow { animation: shadowPulse 3.2s ease-in-out infinite; }
+@keyframes shadowPulse {
+  0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 0.75; }
+  50% { transform: translateX(-50%) scaleX(0.82); opacity: 0.5; }
+}
+
+/* --- Speech bubble ------------------------------------------------------- */
+
+.nova__say {
+  position: absolute;
+  left: 50%;
+  bottom: calc(clamp(9vh, 14vh, 20vh) + clamp(150px, 21vw, 260px));
+  transform: translate(-50%, 14px) scale(0.94);
+  width: min(90vw, 620px);
+  padding: 1.15rem 1.4rem;
+  border-radius: var(--r-lg) var(--r-lg) var(--r-lg) 6px;
+  border: 1px solid var(--line-hi);
+  background: var(--panel);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: var(--shadow-panel), var(--glow-soft);
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease-out-back), visibility 0.5s;
+}
+.nova__say.is-shown { opacity: 1; visibility: visible; transform: translate(-50%, 0) scale(1); }
+.nova__say p {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 0.85rem + 0.9vw, 1.5rem);
+  line-height: 1.35;
+  color: var(--text-hi);
+}
+.nova__say .caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  vertical-align: -0.14em;
+  background: var(--cyan);
+  margin-left: 2px;
+  animation: caretBlink 0.9s steps(1) infinite;
+}
+@keyframes caretBlink { 50% { opacity: 0; } }
+.nova__say strong { color: var(--cyan); font-weight: 600; }
+.nova__name {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 0.5rem;
+}
+
+/* --- Countdown + skip ---------------------------------------------------- */
+
+.boot__foot {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(1.2rem, 4vh, 2.4rem);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  opacity: 0;
+  transition: opacity 0.6s var(--ease);
+}
+.boot__foot.is-shown { opacity: 1; }
+
+.countdown { position: relative; width: 52px; height: 52px; display: grid; place-items: center; }
+.countdown svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.countdown circle { fill: none; stroke-width: 3; }
+.countdown .cd-track { stroke: var(--line); }
+.countdown .cd-arc {
+  stroke: var(--cyan);
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 5px var(--cyan));
+  transition: stroke-dashoffset 1s linear;
+}
+.countdown b {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-hi);
+  font-variant-numeric: tabular-nums;
+}
+
+.boot__hint {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+@media (max-width: 560px) { .boot__hint { display: none; } }
+
+/* Motion-off fallback: no walking, just a fade */
+@media (prefers-reduced-motion: reduce) {
+  .nova { transition: none; }
+  .nova__bob, .nova .leg-l, .nova .leg-r, .nova .arm-l, .nova .arm-r,
+  .boot__floor, .nova__shadow { animation: none !important; }
+}
