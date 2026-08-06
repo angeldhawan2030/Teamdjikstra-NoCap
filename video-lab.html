@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>No Cap — see through fake links, fake media and fake stories</title>
+<meta name="description" content="No Cap is a cybersecurity awareness console: scan suspicious links, test images and video for AI generation, audit news and product reviews, and check scam messages before they cost you.">
+<meta name="theme-color" content="#04070f">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/core.css">
+<link rel="stylesheet" href="/assets/css/tools.css">
+<link rel="stylesheet" href="/assets/css/nova.css">
+<script>
+  // Apply stored appearance before first paint so there is no theme flash.
+  (function () {
+    try {
+      var p = JSON.parse(localStorage.getItem("nocap.prefs.v1") || "{}");
+      if (p.theme) document.documentElement.setAttribute("data-theme", p.theme);
+      if (p.lang) document.documentElement.lang = p.lang;
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body>
+
+<!-- ====================================================== Nova boot screen -->
+<div class="boot" role="dialog" aria-label="No Cap is starting up">
+  <div class="boot__floor" aria-hidden="true"></div>
+  <div class="boot__horizon" aria-hidden="true"></div>
+
+  <div class="boot__brand">
+    <h1 class="grad-text">NO CAP</h1>
+    <p>Truth layer for the open web</p>
+  </div>
+
+  <ul class="boot__log mono" aria-hidden="true"></ul>
+
+  <div class="nova">
+    <div class="nova__inner">
+      <div class="nova__bob">
+        <svg viewBox="0 0 220 225" role="img" aria-label="Nova, the No Cap robot mascot">
+          <defs>
+            <linearGradient id="novaBody" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#1a2b46"/>
+              <stop offset="100%" stop-color="#0d1728"/>
+            </linearGradient>
+            <linearGradient id="novaVisor" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#062330"/>
+              <stop offset="100%" stop-color="#04121c"/>
+            </linearGradient>
+            <filter id="novaGlow" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="4" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <!-- halo: No Cap wears no cap, just a ring of light -->
+          <ellipse cx="110" cy="20" rx="34" ry="8" fill="none" stroke="var(--cyan)" stroke-width="2" opacity=".55" filter="url(#novaGlow)"/>
+
+          <!-- arms -->
+          <g class="arm-l"><rect x="56" y="126" width="13" height="40" rx="6.5" fill="url(#novaBody)" stroke="var(--cyan)" stroke-opacity=".45"/></g>
+          <g class="arm-r"><rect x="151" y="126" width="13" height="40" rx="6.5" fill="url(#novaBody)" stroke="var(--cyan)" stroke-opacity=".45"/></g>
+
+          <!-- legs + feet -->
+          <g class="leg-l">
+            <rect x="90" y="168" width="15" height="38" rx="7.5" fill="url(#novaBody)" stroke="var(--cyan)" stroke-opacity=".4"/>
+            <rect x="84" y="200" width="27" height="11" rx="5.5" fill="#16273f" stroke="var(--cyan)" stroke-opacity=".5"/>
+          </g>
+          <g class="leg-r">
+            <rect x="115" y="168" width="15" height="38" rx="7.5" fill="url(#novaBody)" stroke="var(--cyan)" stroke-opacity=".4"/>
+            <rect x="109" y="200" width="27" height="11" rx="5.5" fill="#16273f" stroke="var(--cyan)" stroke-opacity=".5"/>
+          </g>
+
+          <!-- torso -->
+          <rect x="72" y="122" width="76" height="50" rx="21" fill="url(#novaBody)" stroke="var(--cyan)" stroke-opacity=".55" stroke-width="1.5"/>
+          <circle cx="110" cy="147" r="12" fill="none" stroke="var(--cyan)" stroke-width="2" opacity=".8"/>
+          <circle cx="110" cy="147" r="5" fill="var(--cyan)" filter="url(#novaGlow)"/>
+          <path d="M88 160h12M132 160h-12" stroke="var(--cyan)" stroke-opacity=".35" stroke-width="2" stroke-linecap="round"/>
+
+          <!-- antenna -->
+          <path d="M110 34V16" stroke="var(--cyan)" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="110" cy="11" r="6" fill="var(--cyan)" filter="url(#novaGlow)"/>
+
+          <!-- head -->
+          <rect x="58" y="34" width="104" height="84" rx="34" fill="url(#novaBody)" stroke="var(--cyan)" stroke-opacity=".6" stroke-width="1.6"/>
+          <rect x="70" y="54" width="80" height="46" rx="23" fill="url(#novaVisor)" stroke="var(--cyan)" stroke-opacity=".45"/>
+          <ellipse class="eye" cx="96" cy="77" rx="8.5" ry="10" fill="var(--cyan)" filter="url(#novaGlow)"/>
+          <ellipse class="eye" cx="124" cy="77" rx="8.5" ry="10" fill="var(--cyan)" filter="url(#novaGlow)"/>
+          <path d="M103 92q7 6 14 0" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round" fill="none" opacity=".8"/>
+          <circle cx="76" cy="96" r="5" fill="var(--cyan)" opacity=".22"/>
+          <circle cx="144" cy="96" r="5" fill="var(--cyan)" opacity=".22"/>
+          <!-- ear pods -->
+          <rect x="50" y="66" width="9" height="24" rx="4.5" fill="#16273f" stroke="var(--cyan)" stroke-opacity=".45"/>
+          <rect x="161" y="66" width="9" height="24" rx="4.5" fill="#16273f" stroke="var(--cyan)" stroke-opacity=".45"/>
+        </svg>
+      </div>
+    </div>
+    <div class="nova__shadow" aria-hidden="true"></div>
+  </div>
+
+  <div class="nova__say" role="status">
+    <span class="nova__name">Nova</span>
+    <p data-nova-line>In a world of fake links, this website is the right guide to a world free of scams!</p>
+  </div>
+
+  <div class="boot__foot">
+    <div class="countdown">
+      <svg viewBox="0 0 52 52" aria-hidden="true">
+        <circle class="cd-track" cx="26" cy="26" r="22"/>
+        <circle class="cd-arc" data-cd-arc cx="26" cy="26" r="22"/>
+      </svg>
+      <b data-cd-num>30</b>
+    </div>
+    <button class="btn btn--sm btn--ghost" data-boot-skip type="button">Enter now</button>
+    <span class="boot__hint">or press Esc</span>
+  </div>
+</div>
+
+<!-- ============================================================== ambience -->
+<div class="ambient" aria-hidden="true">
+  <div class="ambient__grid"></div>
+  <div class="ambient__orb ambient__orb--a"></div>
+  <div class="ambient__orb ambient__orb--b"></div>
+  <canvas id="particles"></canvas>
+  <div class="ambient__noise"></div>
+</div>
+<div class="cursor" aria-hidden="true"></div>
+<div class="cursor-ring" aria-hidden="true"></div>
+
+<div class="page">
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- ================================================================ header -->
+<header class="masthead">
+  <div class="wrap masthead__inner">
+    <a class="brand" href="/">
+      <svg class="brand__mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <path d="M16 2.6l11 4.2v8.4c0 6.9-4.6 11.8-11 13.8-6.4-2-11-6.9-11-13.8V6.8l11-4.2z" stroke="var(--cyan)" stroke-width="1.7"/>
+        <path d="M10.5 16.2l3.8 3.8 7.4-7.6" stroke="var(--cyan)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      No&nbsp;Cap
+      <span class="brand__cap">v1</span>
+    </a>
+
+    <nav class="nav" id="primary-nav" aria-label="Primary">
+      <a href="/" data-i18n="nav_home">Home</a>
+      <a href="/link-scanner" data-i18n="nav_link">Link Scanner</a>
+      <a href="/image-lab" data-i18n="nav_image">Image Lab</a>
+      <a href="/video-lab" data-i18n="nav_video">Video Lab</a>
+      <a href="/news-desk" data-i18n="nav_news">News Desk</a>
+      <a href="/review-audit" data-i18n="nav_review">Review Audit</a>
+      <a href="/message-guard" data-i18n="nav_message">Message Guard</a>
+      <a href="/settings" data-i18n="nav_settings">Settings</a>
+    </nav>
+
+    <div class="masthead__actions">
+      <button class="icon-btn" data-theme-toggle type="button" aria-label="Switch colour theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">
+          <path d="M20.5 14.2A8.6 8.6 0 019.8 3.5a8.6 8.6 0 1010.7 10.7z"/>
+        </svg>
+      </button>
+      <button class="icon-btn nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ================================================================ hero -->
+  <section class="wrap hero">
+    <div class="hero__grid">
+      <div class="hero__copy">
+        <span class="eyebrow">Nova is watching the web with you</span>
+        <h1><span class="grad-text" data-i18n="hero_title">Spot the fake before it costs you.</span></h1>
+        <p class="lede" data-i18n="hero_lede">No Cap reads links, images, videos, headlines, reviews and chat messages the way a security analyst would — then explains the verdict in plain language.</p>
+        <p class="hero__tag">Seven detectors. One console. Nothing you paste is stored.</p>
+        <div class="hero__cta">
+          <a class="btn btn--primary" href="/link-scanner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8V5a2 2 0 012-2h3M21 8V5a2 2 0 00-2-2h-3M3 16v3a2 2 0 002 2h3M21 16v3a2 2 0 01-2 2h-3M3 12h18"/></svg>
+            <span data-i18n="hero_cta1">Scan a link</span>
+          </a>
+          <a class="btn btn--ghost" href="#suite">
+            <span data-i18n="hero_cta2">How it works</span>
+          </a>
+        </div>
+        <div class="hero__proof">
+          <div><b>7</b><span>Detectors</span></div>
+          <div><b id="signalCount">61</b><span>Detection signals</span></div>
+          <div><b>21</b><span>Languages</span></div>
+          <div><b>0</b><span>Accounts needed</span></div>
+        </div>
+      </div>
+
+      <div class="console">
+        <div class="console__sweep" aria-hidden="true"></div>
+        <div class="console__bar">
+          <span class="console__dot"></span><span class="console__dot"></span><span class="console__dot"></span>
+          <span style="margin-left:.6rem">nova@nocap — live triage</span>
+        </div>
+        <div class="console__body">
+          <div class="console__line">
+            <span class="tone-danger">▲</span>
+            <span>secure-paytm-refund<span class="muted">.top</span>/verify</span>
+            <span class="console__badge tone-danger">94 risk</span>
+          </div>
+          <div class="console__line">
+            <span class="tone-warn">◆</span>
+            <span>portrait_final.png — hands, 6 fingers</span>
+            <span class="console__badge tone-warn">AI likely</span>
+          </div>
+          <div class="console__line">
+            <span class="tone-danger">▲</span>
+            <span>"Your parcel is held. Pay ₹42 now"</span>
+            <span class="console__badge tone-danger">Scam intent</span>
+          </div>
+          <div class="console__line">
+            <span class="tone-warn">◆</span>
+            <span>Article with no named author</span>
+            <span class="console__badge tone-warn">Unsourced</span>
+          </div>
+          <div class="console__line">
+            <span class="tone-safe">●</span>
+            <span>rbi<span class="muted">.org.in</span>/notifications</span>
+            <span class="console__badge tone-safe">Clean</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================================== about -->
+  <section class="wrap section" id="about">
+    <div class="split">
+      <div class="section-head reveal">
+        <span class="eyebrow">About us</span>
+        <h2 data-i18n="about_title">Why No Cap exists</h2>
+        <p class="lede" data-i18n="about_lede">Most scams work because nobody has ten spare seconds to check. No Cap gives you those ten seconds back.</p>
+        <p class="muted">The name is the promise: no exaggeration, no fear-selling, no hidden agenda. Every verdict on this site shows the exact signals behind it, so you finish a scan knowing <em>why</em> something is suspicious — and you can spot the next one without us.</p>
+        <p class="muted">Nothing you paste, upload or scan is kept. Analysis runs, the answer comes back, the input is discarded.</p>
+      </div>
+
+      <div class="stack reveal" data-delay="0.1">
+        <p class="eyebrow">What we protect you from</p>
+        <div class="protect-list">
+          <div class="protect">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M10 13a5 5 0 007.5.6l3-3a5 5 0 00-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 00-7.5-.6l-3 3a5 5 0 007 7L12.2 19"/></svg>
+            <div><b>Phishing links</b><span>Addresses built to look like your bank, courier or employer.</span></div>
+          </div>
+          <div class="protect">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="M3 9h18M7 13.5h5"/></svg>
+            <div><b>Cloned websites</b><span>Shopfronts and login pages copied pixel for pixel.</span></div>
+          </div>
+          <div class="protect">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="2"/><path d="M4 18l5-4.5 4 3.5 3-2.5 4 3.5"/></svg>
+            <div><b>AI-generated images</b><span>Synthetic faces, products and "evidence" photos.</span></div>
+          </div>
+          <div class="protect">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="2.5" y="6" width="14" height="12" rx="2.5"/><path d="M16.5 10.5l5-3v9l-5-3z"/></svg>
+            <div><b>Deepfake video</b><span>Faces and voices pasted onto someone else's body.</span></div>
+          </div>
+          <div class="protect">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 5h16v14H4z"/><path d="M7.5 9h9M7.5 12.5h9M7.5 16h5"/></svg>
+            <div><b>Fake news</b><span>Unsigned articles, funded angles and recycled headlines.</span></div>
+          </div>
+          <div class="protect">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.8l2.5 5.2 5.7.8-4.1 4 1 5.6-5.1-2.7-5.1 2.7 1-5.6-4.1-4 5.7-.8z"/></svg>
+            <div><b>Paid-for reviews</b><span>Five-star floods written by accounts that never bought anything.</span></div>
+          </div>
+          <div class="protect">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M20.5 11.8a8.4 8.4 0 01-12.2 7.5L3.5 20.5l1.3-4.6a8.4 8.4 0 1115.7-4.1z"/></svg>
+            <div><b>Scam messages</b><span>WhatsApp and SMS bait: parcels, refunds, job offers, "hi mum".</span></div>
+          </div>
+          <div class="protect">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M5.5 7.5h13l-1.2 12H6.7z"/><path d="M9 7.5V6a3 3 0 116 0v1.5"/></svg>
+            <div><b>Misleading products</b><span>Listings promising results the product cannot deliver.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================================== suite -->
+  <section class="wrap section" id="suite">
+    <div class="section-head reveal">
+      <span class="eyebrow">The console</span>
+      <h2 data-i18n="sec_tools">Detection suite</h2>
+      <p class="lede">Seven focused instruments. Each one shows its working: the signals it checked, which ones tripped, and how much each one moved the score.</p>
+    </div>
+
+    <div class="tool-grid">
+      <a class="tool-card reveal" href="/link-scanner">
+        <span class="tool-card__index mono">01</span>
+        <span class="tool-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 012-2h3M21 8V5a2 2 0 00-2-2h-3M3 16v3a2 2 0 002 2h3M21 16v3a2 2 0 01-2 2h-3M3 12h18"/></svg></span>
+        <h3>Fake Website Detector</h3>
+        <p>Twelve checks on any URL: plain HTTP, shorteners, bait keywords, raw IP hosts, hyphen stuffing, length, odd characters and lookalike spelling.</p>
+        <span class="tool-card__go">Run a scan <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
+      </a>
+
+      <a class="tool-card reveal" data-delay="0.06" href="/image-lab">
+        <span class="tool-card__index mono">02</span>
+        <span class="tool-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="2"/><path d="M4 18l5-4.5 4 3.5 3-2.5 4 3.5"/></svg></span>
+        <h3>AI Image Detector</h3>
+        <p>Upload, drag, paste from the clipboard or shoot with the camera. Nova inspects hands, faces, skin, text, crowds, tiles, shadows, reflections and floating objects.</p>
+        <span class="tool-card__go">Open the lab <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
+      </a>
+
+      <a class="tool-card reveal" data-delay="0.12" href="/video-lab">
+        <span class="tool-card__index mono">03</span>
+        <span class="tool-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="14" height="12" rx="2.5"/><path d="M16.5 10.5l5-3v9l-5-3z"/></svg></span>
+        <h3>AI Video Detector</h3>
+        <p>Frames are pulled from your clip and studied for bent fingers, warping backgrounds, shimmering skin, blink rate, stiff motion, wrong shadows and lip-sync drift.</p>
+        <span class="tool-card__go">Test a clip <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
+      </a>
+
+      <a class="tool-card reveal" data-delay="0.18" href="/news-desk">
+        <span class="tool-card__index mono">04</span>
+        <span class="tool-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4z"/><path d="M7.5 9h9M7.5 12.5h9M7.5 16h5"/></svg></span>
+        <h3>Fake News Analyzer</h3>
+        <p>Who wrote it, what they usually cover, who funds the outlet — and whether the writing leans on shouting, outrage or an old date wearing a new headline.</p>
+        <span class="tool-card__go">Check a story <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
+      </a>
+
+      <a class="tool-card reveal" data-delay="0.24" href="/review-audit">
+        <span class="tool-card__index mono">05</span>
+        <span class="tool-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.8l2.5 5.2 5.7.8-4.1 4 1 5.6-5.1-2.7-5.1 2.7 1-5.6-4.1-4 5.7-.8z"/></svg></span>
+        <h3>Fake Review Detector</h3>
+        <p>Sudden five-star floods, copy-paste enthusiasm, usernames like <span class="mono">kev88213</span>, blank avatars, one-brand reviewers and a thin verified-purchase rate.</p>
+        <span class="tool-card__go">Audit reviews <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
+      </a>
+
+      <a class="tool-card reveal" data-delay="0.3" href="/message-guard">
+        <span class="tool-card__index mono">06</span>
+        <span class="tool-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 11.8a8.4 8.4 0 01-12.2 7.5L3.5 20.5l1.3-4.6a8.4 8.4 0 1115.7-4.1z"/></svg></span>
+        <h3>WhatsApp Intent Engine</h3>
+        <p>A semantic read of any pasted message: manufactured urgency, impossible pricing, money requests, payment rails and the wording scam scripts reuse.</p>
+        <span class="tool-card__go">Read a message <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
+      </a>
+
+      <a class="tool-card reveal" data-delay="0.36" href="/settings">
+        <span class="tool-card__index mono">07</span>
+        <span class="tool-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.6M12 18.6v2.6M4.5 4.5l1.9 1.9M17.6 17.6l1.9 1.9M2.8 12h2.6M18.6 12h2.6M4.5 19.5l1.9-1.9M17.6 6.4l1.9-1.9"/></svg></span>
+        <h3>Console Settings</h3>
+        <p>Dark or daylight, twenty-one languages with full right-to-left support, motion damping and the custom cursor — all remembered on your device.</p>
+        <span class="tool-card__go">Tune the console <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============================================================= threats -->
+  <section class="wrap section" id="learn">
+    <div class="section-head reveal">
+      <span class="eyebrow">Field guide</span>
+      <h2 data-i18n="sec_threats">Know the attack</h2>
+      <p class="lede">Five attacks account for most of what actually reaches ordinary people. Tap a card to turn it over and see how each one is run — and what stops it.</p>
+    </div>
+
+    <div class="threat-grid" id="threatGrid"></div>
+  </section>
+
+  <!-- =============================================================== stats -->
+  <section class="wrap section" id="dashboard">
+    <div class="section-head reveal">
+      <span class="eyebrow"><span class="chip chip--live" style="border:0;padding:0">Live</span> from this console</span>
+      <h2 data-i18n="sec_stats">Live threat dashboard</h2>
+      <p class="lede">These numbers come from scans people have actually run here. No inputs are stored — only the tool used, the verdict band and the score.</p>
+    </div>
+
+    <div class="stat-grid reveal" id="statGrid">
+      <div class="stat">
+        <div class="stat__value" data-live="total">—</div>
+        <div class="stat__label">Scans run</div>
+        <div class="stat__note">Across all seven detectors</div>
+      </div>
+      <div class="stat">
+        <div class="stat__value tone-danger" data-live="danger">—</div>
+        <div class="stat__label">High-risk verdicts</div>
+        <div class="stat__note">Scored 65 or above</div>
+      </div>
+      <div class="stat">
+        <div class="stat__value" data-live="flagRate">—</div>
+        <div class="stat__label">Flag rate</div>
+        <div class="stat__note">Share needing caution or worse</div>
+      </div>
+      <div class="stat">
+        <div class="stat__value" data-count="61">0</div>
+        <div class="stat__label">Detection signals</div>
+        <div class="stat__note">Individual checks in the catalogue</div>
+      </div>
+    </div>
+
+    <div class="split mt-3" style="grid-template-columns: minmax(0,1.05fr) minmax(0,0.95fr)">
+      <div class="glass pad reveal">
+        <h3>Where the scans go</h3>
+        <p class="muted mt-1" style="font-size:.88rem">Share of all scans by detector.</p>
+        <div class="bars mt-3" id="toolBars">
+          <div class="empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>
+            <p>No scans logged yet. Run one from any detector and this chart fills in.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass pad reveal" data-delay="0.08">
+        <h3>Recent verdicts</h3>
+        <p class="muted mt-1" style="font-size:.88rem">Anonymised, newest first.</p>
+        <div class="feed mt-3" id="scanFeed">
+          <div class="empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>
+            <p>The feed starts as soon as the first scan lands.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass pad mt-3 reveal" id="factCard">
+      <span class="eyebrow">Fact rotation</span>
+      <p class="lede mt-2" id="factText">Phishing is still the most common way an attacker gets their first foothold — not because it is clever, but because it only has to work once.</p>
+      <div class="row mt-2">
+        <button class="btn btn--sm btn--ghost" id="nextFact" type="button">Next fact</button>
+        <span class="muted mono" style="font-size:.75rem" id="factCounter">1 / 8</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================= cta -->
+  <section class="wrap section section--tight">
+    <div class="glass ticked pad center reveal" style="display:grid;gap:1.1rem;justify-items:center;text-align:center">
+      <span class="eyebrow">Start anywhere</span>
+      <h2>Paste the thing that felt off.</h2>
+      <p class="lede" style="max-width:52ch">A link, a screenshot, a message from an unknown number, a review page that reads a bit too happy. Ten seconds now beats a week of undoing it.</p>
+      <div class="row" style="justify-content:center">
+        <a class="btn btn--primary" href="/link-scanner">Scan a link</a>
+        <a class="btn btn--ghost" href="/message-guard">Check a message</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================================================================ footer -->
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__grid">
+      <div>
+        <a class="brand" href="/">
+          <svg class="brand__mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <path d="M16 2.6l11 4.2v8.4c0 6.9-4.6 11.8-11 13.8-6.4-2-11-6.9-11-13.8V6.8l11-4.2z" stroke="var(--cyan)" stroke-width="1.7"/>
+            <path d="M10.5 16.2l3.8 3.8 7.4-7.6" stroke="var(--cyan)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          No&nbsp;Cap
+        </a>
+        <p class="muted mt-2" style="font-size:.88rem;max-width:38ch" data-i18n="foot_note">Educational tool. Always confirm with an official source before you pay, click or share.</p>
+      </div>
+      <div>
+        <h4>Detectors</h4>
+        <ul>
+          <li><a href="/link-scanner">Link Scanner</a></li>
+          <li><a href="/image-lab">Image Lab</a></li>
+          <li><a href="/video-lab">Video Lab</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Analysis</h4>
+        <ul>
+          <li><a href="/news-desk">News Desk</a></li>
+          <li><a href="/review-audit">Review Audit</a></li>
+          <li><a href="/message-guard">Message Guard</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Console</h4>
+        <ul>
+          <li><a href="/#learn">Field guide</a></li>
+          <li><a href="/#dashboard">Dashboard</a></li>
+          <li><a href="/settings">Settings</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot__base">
+      <span>No Cap — cybersecurity awareness console</span>
+      <span>Nothing you scan is stored</span>
+    </div>
+  </div>
+</footer>
+</div>
+
+<!-- ========================================================== Nova helper -->
+<div class="nova-bubble" role="status" aria-live="polite"></div>
+<button class="nova-helper" type="button" aria-label="Ask Nova for a safety tip">
+  <svg viewBox="0 0 60 60" fill="none" aria-hidden="true">
+    <rect x="12" y="14" width="36" height="30" rx="13" fill="rgba(20,34,56,.9)" stroke="var(--cyan)" stroke-opacity=".6" stroke-width="1.5"/>
+    <rect x="17" y="21" width="26" height="16" rx="8" fill="#04121c" stroke="var(--cyan)" stroke-opacity=".4"/>
+    <ellipse cx="25" cy="29" rx="3.2" ry="3.8" fill="var(--cyan)"/>
+    <ellipse cx="35" cy="29" rx="3.2" ry="3.8" fill="var(--cyan)"/>
+    <path d="M30 14V8" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="30" cy="6" r="3" fill="var(--cyan)"/>
+  </svg>
+</button>
+
+<script src="/assets/js/i18n-data.js"></script>
+<script src="/assets/js/app.js"></script>
+<script src="/assets/js/nova.js"></script>
+<script src="/assets/js/home.js"></script>
+</body>
+</html>
