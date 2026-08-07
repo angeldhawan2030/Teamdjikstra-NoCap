@@ -175,6 +175,7 @@ NoCap is designed with user privacy in mind.
 * User dashboard with scan history
 * Community scam reporting system
 * Improved AI models for higher detection accuracy
+* Cybersecurity Workshop
 
 ---
 
