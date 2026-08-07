@@ -159,8 +159,6 @@ Unlike many detection tools that only provide a score, NoCap explains **why** co
 ##  Privacy
 
 NoCap is designed with user privacy in mind.
-
-* No user accounts required.
 * Uploaded content is analyzed only for the requested detection task.
 * Content is not intended to be stored after analysis.
 * Local heuristic checks continue to work even if AI services are unavailable.
